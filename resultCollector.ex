@@ -5,6 +5,7 @@ defmodule ResultCollector do
 
     def receiver(collection_size, acc, dad_pid)
         when collection_size == length(acc) do
+            IO.puts "RECEIVER GOT :finish"
             send dad_pid, {:finish, acc}
         end
 

@@ -16,7 +16,7 @@ defmodule Parallel do
     end
 
     def distributor(nodes, tasks, func, assignee, return_pid) do
-        IO.puts "DISTRIBUTION IS LAUNCHED"
+        IO.puts "INTO DISTRIBUTION"
         IO.inspect nodes
         IO.inspect tasks
         node_per_task = Enum.take(Stream.cycle(nodes), length(tasks))
@@ -33,14 +33,14 @@ defmodule Parallel do
     def assign_loop([], [], _assignee), do: nil
 
     def launch_tasks([current_node | rest], assignee, func, return_pid) do
-        IO.puts "INTO LAUCNH TASKS"
-        tasks = MapSet.to_list(TaskAssigner.get_tasks(assignee, current_node))
-        IO.puts "FOR NODE"
-        IO.inspect current_node
-        IO.puts "TASKS FOR THE NODE ARE"
-        IO.inspect tasks
-        launch_machine(current_node, tasks, func, return_pid)
-        launch_tasks(rest, assignee, func, return_pid)
+        tasks = TaskAssigner.get_tasks(assignee, current_node)
+        if tasks == nil do
+            nil
+        else
+            tasks = MapSet.to_list(tasks)
+            launch_machine(current_node, tasks, func, return_pid)
+            launch_tasks(rest, assignee, func, return_pid)
+        end
     end
 
     def launch_tasks([], _assignee, _func, _return_pid), do: nil
@@ -54,7 +54,6 @@ defmodule Parallel do
     def launch_machine(_node, [], _func, _return_pid), do: nil
 
     def launch(elem, func, return_pid) do
-        IO.puts "TASK IS LAUNCHED"
         send(return_pid, {:ok,
             List.wrap({func.(elem(elem, 0)), elem(elem, 1)})})
     end

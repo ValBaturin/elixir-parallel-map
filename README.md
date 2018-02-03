@@ -1,6 +1,5 @@
-### Домашнаяя работа номер 1 по курсу 
-## Функциональное программирование
+### EDGE CASE
+`c "taskAssigner.ex"; c "resultCollector.ex"; c "new.ex"; Parallel.map([1], &(&1 * 10))`
+### BASIC CASE
+`c "taskAssigner.ex"; c "resultCollector.ex"; c "new.ex"; Parallel.map([1, 2, 3, 4], &(&1 * 10))`
 
-Пока готова только часть на 7 из 10.
-Как будет сделана реализация с перезапуском задач при падении узлов
-опишу что и как работает здесь.

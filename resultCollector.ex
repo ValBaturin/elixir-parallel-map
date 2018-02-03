@@ -16,6 +16,7 @@ defmodule ResultCollector do
 
     def get_current_result(pid) do
         send(pid, {:current_results, self()})
+        IO.puts "GETTING CURRENT TASKS"
         receive do
             {:current_results, result} -> result
         end

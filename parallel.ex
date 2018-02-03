@@ -8,10 +8,34 @@ defmodule Parallel do
         assignee = TaskAssigner.start
         collector = ResultCollector.start
         distributor(nodes, tasks, func, assignee, collector)
+        spawn(fn -> troubleshooter(nodes, assignee, collector, func) end)
         result = ResultCollector.get_tasks_results(collector,
                                                     length(collection))
         List.keysort(result, 1) |> Enum.map(fn x -> elem(x, 0) end)
     end
+
+    def troubleshooter(nodes, assignee, collector, func) do
+        check(nodes, assignee, collector, func)
+        :timer.sleep(5000)
+        troubleshooter([node() | Node.list], assignee, collector, func)
+    end
+
+    def check([node_h | node_t], assignee, collector, func) do
+        fix({Node.ping(node_h), node_h}, assignee, collector, func)
+        check(node_t, assignee, collector, func)
+    end
+
+    def check([], _assignee, _collector, _func), do: nil
+
+    def fix({:pang, broken}, assignee, collector, func) do
+        tasks = TaskAssigner.get_tasks(assignee, broken)
+        failed_tasks = ResultCollector.get_current_tasks(collector)
+        tasks_to_retry = MapSet.difference(tasks, failed_tasks)
+        distributor([node() | Node.list], tasks_to_retry,
+                    func, assignee, collector)
+        end
+
+    def fix({:pong, _node}, _assignee, _collector, _func), do: nil
 
     def distributor(nodes, tasks, func, assignee, collector) do
         node_per_task = Enum.take(Stream.cycle(nodes), length(tasks))

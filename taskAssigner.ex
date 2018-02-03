@@ -15,18 +15,13 @@ defmodule TaskAssigner do
     end
 
     def get_tasks(pid, node) do
-        IO.puts "GET TASK IS CALLED"
-        IO.inspect pid
-        IO.inspect self()
         send(pid, {:get_tasks, node, self()})
-        IO.puts "sent tasks to DB"
         receive do
             {:response, tasks} -> tasks
         end
     end
 
     defp process(current, {:assign, node, task}) do
-        IO.puts "ASSIGNED!!!"
         new_task = MapSet.new() |> MapSet.put(task)
         tasks = Map.get(current, node)
         cond do
@@ -37,7 +32,6 @@ defmodule TaskAssigner do
     end
 
     defp process(current, {:get_tasks, node, caller}) do
-        IO.puts "PROCESS GET TASKS"
         send(caller, {:response, Map.get(current, node)})
         current
     end

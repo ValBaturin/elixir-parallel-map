@@ -8,7 +8,6 @@ defmodule Parallel do
         return_pid = ResultCollector.collect(length(collection), self())
         assignee = TaskAssigner.start
         distributor(nodes, tasks, func, assignee, return_pid)
-        IO.puts "WAIT FOR RECEIVE(MAIN)"
         receive do
             {:finish, response} -> List.keysort(response, 1) |>
                                 Enum.map(fn x -> elem(x, 0) end)
@@ -16,16 +15,12 @@ defmodule Parallel do
     end
 
     def distributor(nodes, tasks, func, assignee, return_pid) do
-        IO.puts "INTO DISTRIBUTION"
-        IO.inspect nodes
-        IO.inspect tasks
         node_per_task = Enum.take(Stream.cycle(nodes), length(tasks))
         assign_loop(node_per_task, tasks, assignee)
         launch_tasks(nodes, assignee, func, return_pid)
     end
 
     def assign_loop([node_h | node_t], [task_h | task_t], assignee) do
-        IO.puts "INTO ASSIGN LOOP"
         TaskAssigner.assign_task(assignee, node_h, task_h)
         assign_loop(node_t, task_t, assignee)
     end

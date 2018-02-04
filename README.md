@@ -1,4 +1,6 @@
-## DO NOT FOTGET TO SET UP SEVERAL NODES AND CONNECT THEM
+# Elixir Parallel Map Function
+![alt text](/pic.jpeg)
+## DO NOT FORGET TO SET UP SEVERAL NODES AND CONNECT THEM
 Don't forget cookie and to compile libs on every node.
 ### USEFUL COMMANDS:
 `Node.list` checks connection

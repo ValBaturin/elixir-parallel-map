@@ -1,7 +1,10 @@
 # Elixir Parallel Map Function
 ![alt text](/pic.jpeg)
-### DO NOT FORGET TO SET UP SEVERAL NODES AND CONNECT THEM
-Don't forget cookie and to compile libs on every node.
+### DO NOT FORGET TO 
+1. set up several nodes
+2. connect nodes
+3. set up a cookie 
+4. compile libs on every node.
 ### USEFUL COMMANDS:
 `Node.list` checks connection
 

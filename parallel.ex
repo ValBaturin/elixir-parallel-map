@@ -8,31 +8,51 @@ defmodule Parallel do
         assignee = TaskAssigner.start
         collector = ResultCollector.start
         distributor(nodes, tasks, func, assignee, collector)
-        spawn(fn -> troubleshooter(nodes, assignee, collector, func) end)
+        ts = spawn(fn -> troubleshooter(Node.list, assignee, collector, func) end)
         result = ResultCollector.get_tasks_results(collector,
                                                     length(collection))
+        Process.exit(ts, :kill)
         List.keysort(result, 1) |> Enum.map(fn x -> elem(x, 0) end)
     end
 
-    def troubleshooter(nodes, assignee, collector, func) do
-        check(nodes, assignee, collector, func)
+
+    def troubleshooter([], _assignee, _collector, _func), do: nil
+
+    def troubleshooter(unchecked_nodes, assignee, collector, func) do
+        broken = check(unchecked_nodes, assignee, collector, func, [])
+        IO.puts "brokes"
+        IO.inspect broken
         :timer.sleep(5000)
-        troubleshooter([node() | Node.list], assignee, collector, func)
+        unchecked_nodes = unchecked_nodes -- broken
+        troubleshooter(unchecked_nodes, assignee, collector, func)
     end
 
-    def check([node_h | node_t], assignee, collector, func) do
-        fix({Node.ping(node_h), node_h}, assignee, collector, func)
-        check(node_t, assignee, collector, func)
+    def check([node_h | node_t], assignee, collector, func, acc) do
+        acc = acc ++ fix({Node.ping(node_h), node_h}, assignee, collector, func)
+        IO.puts "NODE"
+        IO.inspect node_h
+        IO.puts "checked"
+        IO.inspect acc
+        IO.puts "IS ACC"
+        check(node_t, assignee, collector, func, acc)
     end
 
-    def check([], _assignee, _collector, _func), do: nil
+    def check([], _assignee, _collector, _func, broken) do
+        cond do
+            broken == nil -> []
+            true -> broken
+        end
+        end
 
     def fix({:pang, broken}, assignee, collector, func) do
+        IO.puts "FIXING BROKEN"
+        IO.inspect broken
         tasks = TaskAssigner.get_tasks(assignee, broken)
         failed_tasks = ResultCollector.get_current_tasks(collector)
         tasks_to_retry = MapSet.difference(tasks, failed_tasks)
         distributor([node() | Node.list], tasks_to_retry,
                     func, assignee, collector)
+        broken
         end
 
     def fix({:pong, _node}, _assignee, _collector, _func), do: nil

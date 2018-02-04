@@ -20,4 +20,4 @@
 ### NODE DIES CASE
 You have to kill a node to check task relaunch feature.
 
-`Parallel.map([1, 2, 3, 4], &(&1 * :timer.sleep(&1 * 1000))`
+`Parallel.map([1, 2, 3, 4], &(:timer.sleep(&1 * 1000))`

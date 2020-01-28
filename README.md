@@ -1,5 +1,5 @@
 # Elixir Parallel Map Function
-![alt text](/pic.jpeg)
+
 ### DO NOT FORGET TO 
 1. set up several nodes
 2. connect nodes
